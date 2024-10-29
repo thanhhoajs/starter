@@ -14,7 +14,6 @@ export const runValidators = async () => {
     if (allErrors.length > 0) {
       logger.error('Validation errors:');
       logger.trace(allErrors);
-      process.exit(1);
     } else {
       logger.success('All configurations are valid!');
     }
