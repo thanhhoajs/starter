@@ -1,10 +1,11 @@
-import type { ThanhHoa } from '@thanhhoajs/thanhhoa';
+import { Module } from '@thanhhoajs/thanhhoa';
 
 import { DefaultModule } from './default/default.module';
 
-export class AppModule {
-  constructor(app: ThanhHoa) {
+@Module({
+  imports: [
+    DefaultModule,
     // Add more modules here
-    new DefaultModule(app);
-  }
-}
+  ],
+})
+export class AppModule {}
