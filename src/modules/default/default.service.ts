@@ -1,6 +1,5 @@
-import { type IRequestContext, Provider } from '@thanhhoajs/thanhhoa';
+import { type IRequestContext } from '@thanhhoajs/thanhhoa';
 
-@Provider()
 export class DefaultService {
   hello(): Response {
     return new Response('Welcome to ThanhHoaJS!', {

@@ -1,25 +1,24 @@
-import {
-  Controller,
-  Get,
-  Inject,
-  type IRequestContext,
-} from '@thanhhoajs/thanhhoa';
+import { type IRequestContext, Router } from '@thanhhoajs/thanhhoa';
 
-import { DefaultService } from './default.service';
+import type { DefaultService } from './default.service';
 
-@Controller()
 export class DefaultController {
-  constructor(
-    @Inject(DefaultService.name)
-    private readonly defaultService: DefaultService,
-  ) {}
+  private readonly router: Router;
 
-  @Get()
+  constructor(private readonly defaultService: DefaultService) {
+    this.router = new Router();
+    this.router.get('/', () => this.hello());
+    this.router.get('/user-agent', (ctx) => this.userAgent(ctx));
+  }
+
+  getRouter(): Router {
+    return this.router;
+  }
+
   hello(): Response {
     return this.defaultService.hello();
   }
 
-  @Get('/user-agent')
   userAgent(context: IRequestContext): Response {
     return this.defaultService.userAgent(context);
   }

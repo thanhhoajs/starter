@@ -7,13 +7,12 @@ const logger = Logger.get('CONFIGS');
 export const runValidators = async () => {
   try {
     // Add more validators here
-    const results = await Promise.all([appValidator.validate(appConfig)]);
+    const isValid = appValidator(appConfig);
+    const errors = appValidator.errors;
 
-    const allErrors = results.filter((errors) => errors.length > 0);
-
-    if (allErrors.length > 0) {
+    if (!isValid && errors && errors.length > 0) {
       logger.error('Validation errors:');
-      logger.trace(allErrors);
+      logger.trace(errors);
     } else {
       logger.success('All configurations are valid!');
     }

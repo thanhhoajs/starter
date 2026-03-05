@@ -1,11 +1,14 @@
-import { Module } from '@thanhhoajs/thanhhoa';
+import { Router } from '@thanhhoajs/thanhhoa';
 
 import { DefaultModule } from './default/default.module';
 
-@Module({
-  imports: [
-    DefaultModule,
+export class AppModule {
+  readonly router: Router;
+
+  constructor() {
+    this.router = new Router();
+    const defaultModule = new DefaultModule();
+    this.router.use(defaultModule.router);
     // Add more modules here
-  ],
-})
-export class AppModule {}
+  }
+}

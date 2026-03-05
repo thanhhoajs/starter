@@ -1,12 +1,12 @@
 import { Logger } from '@thanhhoajs/logger';
-import { ThanhHoa } from '@thanhhoajs/thanhhoa';
 import {
-  cacheMiddleware,
-  compressionMiddleware,
-  corsMiddleware,
-  helmetMiddleware,
-  rateLimiterMiddleware,
-} from '@thanhhoajs/utils';
+  cacheControl,
+  compress,
+  cors,
+  helmet,
+  rateLimit,
+  ThanhHoa,
+} from '@thanhhoajs/thanhhoa';
 
 import { runValidators } from './configs';
 import { appConfig } from './configs/app.config';
@@ -21,28 +21,46 @@ async function bootstrap() {
   const app = new ThanhHoa();
 
   // Middlewares
-  app.use(corsMiddleware());
-  app.use(helmetMiddleware());
   app.use(
-    await rateLimiterMiddleware({
-      windowMs: 600000, // 10 minute
-      maxRequests: 100, // 100 request
-      message: 'Too many requests, please try again later',
-      skipFailedRequests: false,
-      skipSuccessfulRequests: false,
-    }),
-  );
-  app.use(cacheMiddleware());
-  app.use(
-    compressionMiddleware({
-      level: 6,
-      library: 'zlib',
-      memLevel: 9,
-      windowBits: 9,
+    cors({
+      origin: 'https://example.com',
+      methods: ['GET', 'POST'],
+      credentials: true,
     }),
   );
 
-  app.listen({ port: appConfig.port, development: true }, [AppModule]);
+  app.use(helmet({ contentSecurityPolicy: false }));
+
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100,
+      message: 'Too many requests',
+      skip: ['/health', '/metrics'],
+    }),
+  );
+
+  app.use(
+    cacheControl({
+      maxAge: 3600,
+      staleIfError: 86400,
+      mustRevalidate: true,
+      skip: ['/health'],
+    }),
+  );
+
+  app.use(
+    compress({
+      threshold: 1024,
+      encoding: ['gzip'],
+    }),
+  );
+
+  // Register modules
+  const appModule = new AppModule();
+  app.use(appModule.router);
+
+  app.listen({ port: appConfig.port });
   console.log(`Server is running on http://localhost:${appConfig.port}`);
 }
 
